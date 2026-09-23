@@ -1,0 +1,118 @@
+{
+  "file_name": "en.openfoodfacts.org.products.tsv",
+  "rows": 356027,
+  "cols": 163,
+  "nutrition_related_columns_count": 102,
+  "sample_nutrition_cols": [
+    "nutrition_grade_uk",
+    "nutrition_grade_fr",
+    "energy_100g",
+    "energy-from-fat_100g",
+    "fat_100g",
+    "saturated-fat_100g",
+    "-butyric-acid_100g",
+    "-caproic-acid_100g",
+    "-caprylic-acid_100g",
+    "-capric-acid_100g",
+    "-lauric-acid_100g",
+    "-myristic-acid_100g",
+    "-palmitic-acid_100g",
+    "-stearic-acid_100g",
+    "-arachidic-acid_100g"
+  ],
+  "target_missing_ratios": {
+    "energy-kcal_100g": "Not found. Similar: []",
+    "proteins_100g": 0.1737677198639429,
+    "fat_100g": 0.21495560729944638,
+    "carbohydrates_100g": 0.21573363817912686,
+    "sugars_100g": 0.2158291365542501,
+    "fiber_100g": 0.3801509436082095,
+    "salt_100g": 0.1861881261814413
+  },
+  "labels_info": {
+    "pnns_groups_1": {
+      "missing_ratio": 0.6376510770250571,
+      "unique_count": 14,
+      "top_5": {
+        "unknown": 43603,
+        "Sugary snacks": 14750,
+        "Beverages": 13476,
+        "Milk and dairy products": 10733,
+        "Cereals and potatoes": 10078
+      }
+    },
+    "pnns_groups_2": {
+      "missing_ratio": 0.6273063559786196,
+      "unique_count": 42,
+      "top_5": {
+        "unknown": 43603,
+        "Non-sugared beverages": 7290,
+        "One-dish meals": 6495,
+        "Sweets": 5685,
+        "Biscuits and cakes": 5511
+      }
+    },
+    "categories_en": {
+      "missing_ratio": 0.7098506573939617,
+      "unique_count": 24112,
+      "top_5": {
+        "Beverages,Non-sugared beverages": 2345,
+        "Sugary snacks,Biscuits and cakes,Biscuits": 893,
+        "Fats": 732,
+        "Sugary snacks,Chocolates,Dark chocolates": 678,
+        "Sugary snacks,Confectioneries,Candies": 587
+      }
+    },
+    "nutriscore_grade": "Not found"
+  },
+  "anomalies": {
+    "proteins_100g": {
+      "min": -800.0,
+      "max": 15666666000.0,
+      "1%": 0.0,
+      "99%": 33.33,
+      "negative_count": 3,
+      "extreme_high_count": 5
+    },
+    "fat_100g": {
+      "min": 0.0,
+      "max": 15666666000.0,
+      "1%": 0.0,
+      "99%": 92.30039999999978,
+      "negative_count": 0,
+      "extreme_high_count": 4
+    },
+    "carbohydrates_100g": {
+      "min": 0.0,
+      "max": 15666666000.0,
+      "1%": 0.0,
+      "99%": 99.0,
+      "negative_count": 0,
+      "extreme_high_count": 21
+    },
+    "sugars_100g": {
+      "min": -17.86,
+      "max": 3520.0,
+      "1%": 0.0,
+      "99%": 87.5,
+      "negative_count": 7,
+      "extreme_high_count": 13
+    },
+    "fiber_100g": {
+      "min": -6.7,
+      "max": 84818150000.0,
+      "1%": 0.0,
+      "99%": 21.0,
+      "negative_count": 1,
+      "extreme_high_count": 13
+    },
+    "salt_100g": {
+      "min": 0.0,
+      "max": 64312.8,
+      "1%": 0.0,
+      "99%": 22.280999999999768,
+      "negative_count": 0,
+      "extreme_high_count": 164
+    }
+  }
+}

@@ -1,0 +1,41 @@
+[
+    {
+        "Model": "Decision Tree",
+        "Train Accuracy": 0.8278080277550234,
+        "Validation Accuracy": 0.7086159727167111,
+        "Overfitting Gap": 0.11919205503831232,
+        "Train Precision": 0.8279214648281323,
+        "Validation Precision": 0.708219915525664,
+        "Train Recall": 0.8278080277550234,
+        "Validation Recall": 0.7086159727167111,
+        "Train F1": 0.8277199015837452,
+        "Validation F1": 0.7082868742608619,
+        "Training Time (s)": 0.78
+    },
+    {
+        "Model": "Random Forest",
+        "Train Accuracy": 0.9427713262339581,
+        "Validation Accuracy": 0.7642693850016865,
+        "Overfitting Gap": 0.1785019412322716,
+        "Train Precision": 0.9429234674549728,
+        "Validation Precision": 0.7642715846060576,
+        "Train Recall": 0.9427713262339581,
+        "Validation Recall": 0.7642693850016865,
+        "Train F1": 0.9427458603537028,
+        "Validation F1": 0.7638629920398129,
+        "Training Time (s)": 3.86
+    },
+    {
+        "Model": "LightGBM",
+        "Train Accuracy": 0.7514014038131033,
+        "Validation Accuracy": 0.7373233894239778,
+        "Overfitting Gap": 0.014078014389125482,
+        "Train Precision": 0.7513351757103559,
+        "Validation Precision": 0.7365320168832648,
+        "Train Recall": 0.7514014038131033,
+        "Validation Recall": 0.7373233894239778,
+        "Train F1": 0.7508304265538454,
+        "Validation F1": 0.7363019514019145,
+        "Training Time (s)": 2.98
+    }
+]

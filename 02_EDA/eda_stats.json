@@ -1,0 +1,182 @@
+{
+    "feature_stats": {
+        "energy_100g": {
+            "mean": 1125.453319869857,
+            "median": 1092.0,
+            "min": 0.0,
+            "max": 231199.0,
+            "missing_ratio": 0.17038033632280697,
+            "extreme_outliers_count": 113
+        },
+        "proteins_100g": {
+            "mean": 53265.9801332794,
+            "median": 4.88,
+            "min": -800.0,
+            "max": 15666666000.0,
+            "missing_ratio": 0.1737677198639429,
+            "extreme_outliers_count": 8
+        },
+        "fat_100g": {
+            "mean": 56065.871771031976,
+            "median": 5.29,
+            "min": 0.0,
+            "max": 15666666000.0,
+            "missing_ratio": 0.21495560729944638,
+            "extreme_outliers_count": 4
+        },
+        "carbohydrates_100g": {
+            "mean": 56140.201580713794,
+            "median": 20.0,
+            "min": 0.0,
+            "max": 15666666000.0,
+            "missing_ratio": 0.21573363817912686,
+            "extreme_outliers_count": 21
+        },
+        "sugars_100g": {
+            "mean": 15.673428227960676,
+            "median": 5.4,
+            "min": -17.86,
+            "max": 3520.0,
+            "missing_ratio": 0.2158291365542501,
+            "extreme_outliers_count": 20
+        },
+        "fiber_100g": {
+            "mean": 384346.7342127607,
+            "median": 1.5,
+            "min": -6.7,
+            "max": 84818150000.0,
+            "missing_ratio": 0.3801509436082095,
+            "extreme_outliers_count": 14
+        },
+        "salt_100g": {
+            "mean": 1.9412805873405825,
+            "median": 0.5588,
+            "min": 0.0,
+            "max": 64312.8,
+            "missing_ratio": 0.1861881261814413,
+            "extreme_outliers_count": 164
+        }
+    },
+    "nutrition_grade_fr": {
+        "counts": {
+            "NaN": 101171,
+            "d": 72436,
+            "c": 52870,
+            "e": 50236,
+            "a": 40304,
+            "b": 39010
+        },
+        "percentages": {
+            "NaN": 0.2841666502821415,
+            "d": 0.20345647942431333,
+            "c": 0.14849997331663048,
+            "e": 0.14110165802031868,
+            "a": 0.11320489738137837,
+            "b": 0.10957034157521761
+        },
+        "missing_ratio": 0.2841666502821415
+    },
+    "pnns_groups_1": {
+        "counts": {
+            "NaN": 227021,
+            "unknown": 43603,
+            "Sugary snacks": 14750,
+            "Beverages": 13476,
+            "Milk and dairy products": 10733,
+            "Cereals and potatoes": 10078,
+            "Fish Meat Eggs": 9473,
+            "Composite foods": 7972,
+            "Fat and sauces": 7122,
+            "Fruits and vegetables": 6763,
+            "Salty snacks": 3299,
+            "fruits-and-vegetables": 1098,
+            "sugary-snacks": 619,
+            "cereals-and-potatoes": 19,
+            "salty-snacks": 1
+        },
+        "percentages": {
+            "NaN": 0.6376510770250571,
+            "unknown": 0.12247104854407109,
+            "Sugary snacks": 0.04142944214905049,
+            "Beverages": 0.0378510618576681,
+            "Milk and dairy products": 0.030146590005814166,
+            "Cereals and potatoes": 0.02830684189682243,
+            "Fish Meat Eggs": 0.026607532574776632,
+            "Composite foods": 0.022391560190659698,
+            "Fat and sauces": 0.02000410081257882,
+            "Fruits and vegetables": 0.018995750322307017,
+            "Salty snacks": 0.009266151162692717,
+            "fruits-and-vegetables": 0.003084035761332708,
+            "sugary-snacks": 0.0017386321823906613,
+            "cereals-and-potatoes": 5.3366739039454874e-05,
+            "salty-snacks": 2.8087757389186775e-06
+        },
+        "missing_ratio": 0.6376510770250571,
+        "unknown_ratio": 0.12247104854407109
+    },
+    "correlation": {
+        "energy_100g": {
+            "energy_100g": 1.0,
+            "proteins_100g": 0.2802721893099517,
+            "fat_100g": 0.7788552688543534,
+            "carbohydrates_100g": 0.49550422993047527,
+            "sugars_100g": 0.3229066242547871,
+            "fiber_100g": 0.2652781447480709,
+            "salt_100g": -0.07858131212891535
+        },
+        "proteins_100g": {
+            "energy_100g": 0.2802721893099517,
+            "proteins_100g": 1.0,
+            "fat_100g": 0.22288856251767028,
+            "carbohydrates_100g": -0.09949630080002189,
+            "sugars_100g": -0.2622853732526743,
+            "fiber_100g": 0.2301635519033145,
+            "salt_100g": 0.004587729461049997
+        },
+        "fat_100g": {
+            "energy_100g": 0.7788552688543534,
+            "proteins_100g": 0.22288856251767028,
+            "fat_100g": 1.0,
+            "carbohydrates_100g": -0.09236102501582014,
+            "sugars_100g": -0.05199394033916967,
+            "fiber_100g": 0.13039007650058698,
+            "salt_100g": -0.046726108656138195
+        },
+        "carbohydrates_100g": {
+            "energy_100g": 0.49550422993047527,
+            "proteins_100g": -0.09949630080002189,
+            "fat_100g": -0.09236102501582014,
+            "carbohydrates_100g": 1.0,
+            "sugars_100g": 0.6721297786247971,
+            "fiber_100g": 0.24951219153818538,
+            "salt_100g": -0.07555058573277612
+        },
+        "sugars_100g": {
+            "energy_100g": 0.3229066242547871,
+            "proteins_100g": -0.2622853732526743,
+            "fat_100g": -0.05199394033916967,
+            "carbohydrates_100g": 0.6721297786247971,
+            "sugars_100g": 1.0,
+            "fiber_100g": -0.013207081978988707,
+            "salt_100g": -0.08819298522243317
+        },
+        "fiber_100g": {
+            "energy_100g": 0.2652781447480709,
+            "proteins_100g": 0.2301635519033145,
+            "fat_100g": 0.13039007650058698,
+            "carbohydrates_100g": 0.24951219153818538,
+            "sugars_100g": -0.013207081978988707,
+            "fiber_100g": 1.0,
+            "salt_100g": -0.009624177169212388
+        },
+        "salt_100g": {
+            "energy_100g": -0.07858131212891535,
+            "proteins_100g": 0.004587729461049997,
+            "fat_100g": -0.046726108656138195,
+            "carbohydrates_100g": -0.07555058573277612,
+            "sugars_100g": -0.08819298522243317,
+            "fiber_100g": -0.009624177169212388,
+            "salt_100g": 1.0
+        }
+    }
+}

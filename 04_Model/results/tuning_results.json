@@ -1,0 +1,74 @@
+[
+    {
+        "max_depth": 3,
+        "Train Accuracy": 0.4987792929536292,
+        "Validation Accuracy": 0.498219840347787,
+        "Accuracy Diff": 0.0005594526058422256,
+        "Train Precision": 0.4507848535125679,
+        "Validation Precision": 0.45060413553109885,
+        "Train Recall": 0.4987792929536292,
+        "Validation Recall": 0.498219840347787,
+        "Train F1": 0.45004500951828214,
+        "Validation F1": 0.44914570988465696
+    },
+    {
+        "max_depth": 5,
+        "Train Accuracy": 0.5870637176954336,
+        "Validation Accuracy": 0.586328373871004,
+        "Accuracy Diff": 0.0007353438244296351,
+        "Train Precision": 0.6214044329607082,
+        "Validation Precision": 0.6226945159679756,
+        "Train Recall": 0.5870637176954336,
+        "Validation Recall": 0.586328373871004,
+        "Train F1": 0.581028817441512,
+        "Validation F1": 0.5802846165232268
+    },
+    {
+        "max_depth": 8,
+        "Train Accuracy": 0.6641449428998217,
+        "Validation Accuracy": 0.6618820972154555,
+        "Accuracy Diff": 0.002262845684366188,
+        "Train Precision": 0.6656479349102667,
+        "Validation Precision": 0.6628173236821395,
+        "Train Recall": 0.6641449428998217,
+        "Validation Recall": 0.6618820972154555,
+        "Train F1": 0.6617722761545782,
+        "Validation F1": 0.6591554379783706
+    },
+    {
+        "max_depth": 10,
+        "Train Accuracy": 0.7069339372620826,
+        "Validation Accuracy": 0.6880410748416594,
+        "Accuracy Diff": 0.018892862420423207,
+        "Train Precision": 0.7105816367813583,
+        "Validation Precision": 0.6911209015199878,
+        "Train Recall": 0.7069339372620826,
+        "Validation Recall": 0.6880410748416594,
+        "Train F1": 0.707684039229286,
+        "Validation F1": 0.6886857998568
+    },
+    {
+        "max_depth": 15,
+        "Train Accuracy": 0.8278080277550234,
+        "Validation Accuracy": 0.7086159727167111,
+        "Accuracy Diff": 0.11919205503831232,
+        "Train Precision": 0.8279214648281323,
+        "Validation Precision": 0.708219915525664,
+        "Train Recall": 0.8278080277550234,
+        "Validation Recall": 0.7086159727167111,
+        "Train F1": 0.8277199015837452,
+        "Validation F1": 0.7082868742608619
+    },
+    {
+        "max_depth": "None",
+        "Train Accuracy": 0.9936876596154772,
+        "Validation Accuracy": 0.6860173143949331,
+        "Accuracy Diff": 0.30767034522054415,
+        "Train Precision": 0.9937020830995377,
+        "Validation Precision": 0.685468581109924,
+        "Train Recall": 0.9936876596154772,
+        "Validation Recall": 0.6860173143949331,
+        "Train F1": 0.9936874630300608,
+        "Validation F1": 0.6857117324296483
+    }
+]
