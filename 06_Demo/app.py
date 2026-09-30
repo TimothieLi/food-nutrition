@@ -6,7 +6,9 @@ import sys
 # 將 utils 目錄加入環境路徑
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from utils.ocr_engine import extract_nutrition_info, is_nutrition_info_found
+from dotenv import load_dotenv
+load_dotenv()
+from utils.llm_vision import extract_nutrition_info
 from utils.model_runner import load_model, predict_nutrition_grade
 
 # 設定頁面配置
@@ -57,25 +59,34 @@ elif uploaded_file is not None:
 
 if input_image is not None and not st.session_state.image_uploaded:
     st.session_state.image_uploaded = True
-    st.info("🔄 正在進行 OCR 文字辨識...")
     
-    # 進行 OCR
-    ocr_results = extract_nutrition_info(input_image)
+    with st.spinner("🔄 正在透過 Vision LLM 辨識營養標示..."):
+        # 進行 OCR
+        ocr_results, error_msg = extract_nutrition_info(input_image)
     
-    if not is_nutrition_info_found(ocr_results):
-        st.warning("⚠️ 找不到足夠的營養資訊。請拍攝食品包裝上的營養標示，或改用手動輸入。")
-        st.session_state.ocr_data = {k: 0.0 for k in ocr_results.keys()} # 提供全空預設值
+    # 預設全空數值
+    default_empty = {k: 0.0 for k in ['energy_100g', 'proteins_100g', 'fat_100g', 'carbohydrates_100g', 'sugars_100g', 'salt_100g']}
+    
+    if error_msg:
+        st.error(error_msg)
+        st.session_state.ocr_data = default_empty
+    elif ocr_results.get("status") == "not_found":
+        st.warning("⚠️ 找不到足夠的營養資訊。\n請確認照片中包含完整的食品營養標示。")
+        st.session_state.ocr_data = default_empty
+    elif ocr_results.get("status") == "uncertain":
+        st.warning("⚠️ 無法辨識這張圖片中的完整營養標示，請重新拍攝或手動確認。")
+        st.session_state.ocr_data = default_empty
     else:
-        # 檢查是否有缺漏
-        missing_fields = [k for k, v in ocr_results.items() if v is None]
+        # success 狀態
+        missing_fields = [k for k in default_empty.keys() if ocr_results.get(k) is None]
         if missing_fields:
-            st.warning("⚠️ 營養資訊辨識不完整。請手動補充缺漏的欄位。")
+            st.warning("⚠️ 部分營養資訊無法可靠辨識，請重新拍攝或手動確認。")
         else:
-            st.success("✅ 辨識完成！")
+            st.success("✅ 營養資訊辨識完成！")
         
         # 補齊 None 為 0.0，方便顯示於表單
-        for k in ocr_results:
-            if ocr_results[k] is None:
+        for k in default_empty.keys():
+            if ocr_results.get(k) is None:
                 ocr_results[k] = 0.0
         
         st.session_state.ocr_data = ocr_results
@@ -87,7 +98,7 @@ elif input_image is None:
 
 # 手動修改與確認區塊
 st.markdown("---")
-st.write("### Step 2: 確認與修改營養資訊 (每 100g)")
+st.write("### Step 2：確認營養資訊（每 100 公克）")
 
 # 無論有無照片，都允許使用者手動輸入
 if st.session_state.ocr_data is None:
@@ -103,33 +114,32 @@ if st.session_state.ocr_data is None:
 else:
     current_data = st.session_state.ocr_data
 
-st.info("AI 辨識到以下營養資訊，請確認是否正確。您可以隨時手動修改。")
+st.info("AI 已辨識以下營養資訊，請確認是否正確；如有需要，可以直接修改。")
 
 with st.form("nutrition_form"):
     col1, col2 = st.columns(2)
     
     with col1:
-        energy = st.number_input("Energy (kcal)", value=float(current_data['energy_100g']), min_value=0.0, step=1.0)
-        protein = st.number_input("Protein (g)", value=float(current_data['proteins_100g']), min_value=0.0, step=0.1)
-        fat = st.number_input("Fat (g)", value=float(current_data['fat_100g']), min_value=0.0, step=0.1)
+        energy_kcal = st.number_input("熱量 (kcal)", value=float(current_data['energy_100g']), min_value=0.0, step=1.0)
+        protein = st.number_input("蛋白質 (g)", value=float(current_data['proteins_100g']), min_value=0.0, step=0.1)
+        fat = st.number_input("脂肪 (g)", value=float(current_data['fat_100g']), min_value=0.0, step=0.1)
     
     with col2:
-        carbs = st.number_input("Carbohydrates (g)", value=float(current_data['carbohydrates_100g']), min_value=0.0, step=0.1)
-        sugars = st.number_input("Sugars (g)", value=float(current_data['sugars_100g']), min_value=0.0, step=0.1)
-        salt = st.number_input("Salt (g)", value=float(current_data['salt_100g']), min_value=0.0, step=0.01)
+        carbs = st.number_input("碳水化合物 (g)", value=float(current_data['carbohydrates_100g']), min_value=0.0, step=0.1)
+        sugars = st.number_input("糖 (g)", value=float(current_data['sugars_100g']), min_value=0.0, step=0.1)
+        salt = st.number_input("食鹽 (g)", value=float(current_data['salt_100g']), min_value=0.0, step=0.01)
 
-    submitted = st.form_submit_button("✅ 確認並開始 AI 分析", type="primary", use_container_width=True)
+    submitted = st.form_submit_button("確認", type="primary", use_container_width=True)
 
 # 執行預測
 if submitted:
     st.markdown("---")
-    st.write("### Step 3: AI 分析結果")
     
     if model is None:
         st.error("模型載入失敗，無法進行分析。")
     else:
         user_input = {
-            'energy_100g': energy,
+            'energy_100g': energy_kcal * 4.184,  # 將 kcal 轉換回 kJ 送進模型
             'proteins_100g': protein,
             'fat_100g': fat,
             'carbohydrates_100g': carbs,
@@ -144,7 +154,11 @@ if submitted:
         color_map = {'A': '#008b45', 'B': '#85bb2f', 'C': '#fecb02', 'D': '#ee8100', 'E': '#e63e11', 'Unknown': 'gray'}
         grade_color = color_map.get(grade, 'gray')
         
-        # 顯示大大的結果
+        # ━━━━━━━━━━━━━━━━━━━━
+        # 【1. 🥗 AI 預測營養分級】
+        # ━━━━━━━━━━━━━━━━━━━━
+        st.write("### 🥗 AI 預測營養分級")
+        
         st.markdown(f"""
         <div style='text-align: center; padding: 2rem; border-radius: 10px; background-color: #f0f2f6; margin-bottom: 2rem;'>
             <h2 style='color: #31333F;'>Nutrition Grade</h2>
@@ -152,22 +166,58 @@ if submitted:
         </div>
         """, unsafe_allow_html=True)
         
-        st.write("#### 本次分析使用的營養資訊：")
-        st.json({
-            "Energy (kcal/100g)": energy,
-            "Protein (g/100g)": protein,
-            "Fat (g/100g)": fat,
-            "Carbohydrates (g/100g)": carbs,
-            "Sugars (g/100g)": sugars,
-            "Salt (g/100g)": salt
-        })
+        def get_badge_html(target_grade, current_grade, color):
+            bg = color if target_grade == current_grade else '#e0e0e0'
+            return f"<div style='background-color: {bg}; color: white; padding: 5px; border-radius: 50%; font-weight: bold; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px;'>{target_grade}</div>"
+
+        html_badges = f"""
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 400px; margin: 1.5rem auto 1rem auto;">
+            {get_badge_html('A', grade, '#008b45')}
+            <div style="color: #ccc; font-size: 1.5rem;">➔</div>
+            {get_badge_html('B', grade, '#85bb2f')}
+            <div style="color: #ccc; font-size: 1.5rem;">➔</div>
+            {get_badge_html('C', grade, '#fecb02')}
+            <div style="color: #ccc; font-size: 1.5rem;">➔</div>
+            {get_badge_html('D', grade, '#ee8100')}
+            <div style="color: #ccc; font-size: 1.5rem;">➔</div>
+            {get_badge_html('E', grade, '#e63e11')}
+        </div>
+        <div style="display: flex; justify-content: space-between; max-width: 400px; margin: 0.8rem auto 2rem auto; font-size: 1rem; color: gray; font-weight: 500;'>
+            <span>較佳</span>
+            <span>較需留意</span>
+        </div>
+        """
+        st.markdown(html_badges, unsafe_allow_html=True)
         
-        st.write("#### 模型資訊：")
-        st.code("Model: Random Forest\nTest Accuracy: 76.12%")
+        grade_desc = {
+            'A': '較佳',
+            'B': '良好',
+            'C': '中等',
+            'D': '需留意',
+            'E': '較需留意'
+        }.get(grade, '未知')
         
+        st.write(f"此食品在本 Demo 的營養分類模型中，被判定為 **{grade} 級**，屬於**{grade_desc}**的分類。")
+        
+        # ━━━━━━━━━━━━━━━━━━━━
+        # 【2. 💡 營養觀察】
+        # ━━━━━━━━━━━━━━━━━━━━
+        st.write("### 💡 營養觀察")
+        with st.spinner("🔄 正在產生營養觀察..."):
+            from utils.llm_vision import generate_nutrition_advice
+            nutrition_for_prompt = {
+                'energy_100g': energy_kcal,
+                'proteins_100g': protein,
+                'fat_100g': fat,
+                'carbohydrates_100g': carbs,
+                'sugars_100g': sugars,
+                'salt_100g': salt
+            }
+            advice = generate_nutrition_advice(nutrition_for_prompt, grade)
+            st.write(advice)
+            
+        # ━━━━━━━━━━━━━━━━━━━━
+        # 【3. ⚠️ 使用提醒】
+        # ━━━━━━━━━━━━━━━━━━━━
         st.markdown("---")
-        st.markdown("#### 📖 關於 Nutrition Grade")
-        st.caption("A / B / C / D / E 是 Open Food Facts 資料中的 Nutrition Grade。")
-        st.caption("Demo 中的 Machine Learning 模型是學習食品營養特徵與資料集中 Nutrition Grade 之間的關係，進而對未知食品進行 A～E Classification 預測。")
-        
-        st.warning("⚠️ **資訊素養提醒**\n\n1. 此結果是 Machine Learning 模型根據輸入特徵所做的分類預測，**不代表完整的健康評估**，亦非醫療建議。\n2. **AI 預測並非絕對正確**。\n3. OCR 辨識結果可能出現錯誤，請隨時留意數值是否合理。")
+        st.caption("⚠️ **使用提醒**：AI 預測僅供參考，並非健康診斷；請確認營養標示與食用份量後再做判斷。")
