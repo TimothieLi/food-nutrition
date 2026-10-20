@@ -1,88 +1,137 @@
 # AI 食品營養標示分析器 Demo
 
-這是一個整合 **Google Gemini Vision API** 與 **Random Forest 分類模型** 的端對端營養分析應用程式。使用者可透過拍照或上傳食品營養標示圖片，由 Vision LLM 自動擷取營養數值，經嚴格的資料品質驗證後，由隨機森林模型預測 Nutrition Grade (A～E)，並產生具備行動指引的「四段式 AI 營養觀察報告」。
+這是一個整合 **Google Gemini Vision API** 與 **Random Forest 分類模型** 的展示專案。使用者可以拍攝或上傳台灣／國際食品的營養標示，系統透過大語言模型自動擷取營養數值，進行完整的資料驗證與例外處理，再送入機器學習模型預測 Nutrition Grade（A～E），並由 Gemini 生成結構化的 AI 營養觀察報告。
 
 ---
 
 ## 1. 如何啟動 Demo
 
 ### 步驟 1：設定 API Key
-本專案使用 Google Gemini API 進行圖像辨識與營養觀察生成。請在 `06_Demo` 目錄下建立 `.env` 檔案，填入您的 API Key：
+本專案需要 Google Gemini API Key 以驅動 OCR 辨識與 AI 觀察報告。請在 `06_Demo` 目錄下建立 `.env` 檔案：
+
 ```env
 GEMINI_API_KEY=您的_API_KEY
 ```
-*(可前往 [Google AI Studio](https://aistudio.google.com/app/apikey) 免費申請)*
+
+> 可前往 [Google AI Studio](https://aistudio.google.com/app/apikey) 免費申請。
 
 ### 步驟 2：安裝 Python 套件
-進入 `06_Demo` 目錄後安裝相依套件：
+
+進入 `06_Demo` 目錄後執行：
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 步驟 3：啟動 Web App
+
 ```bash
 streamlit run app.py
 ```
-程式將啟動本地伺服器並自動在瀏覽器中開啟 Web UI（預設為 `http://localhost:8501`）。
+
+程式將自動開啟瀏覽器並顯示 Web UI。
 
 ---
 
-## 2. 系統架構與功能亮點
+## 2. 主要功能
 
-### 1. 多模態視覺辨識 (Vision OCR)
-- 呼叫 `gemini-2.5-flash` 進行食品營養標示圖片分析。
-- 自動識別標示計算基準（每 100g、每 100ml、每份或整包）。
-- 嚴格遵守「缺失不猜測」原則，未辨識出之欄位維持 `None`，不任意預設填 0。
+### 📸 OCR 辨識與手動輸入
+- 支援相機拍攝或圖片上傳，呼叫 **Gemini Vision API**（`gemini-2.5-flash`）自動識別營養成分並完成單位轉換（kcal、公克、毫克）。
+- 若圖片無法辨識，系統允許使用者全手動輸入數值。
 
-### 2. 嚴格輸入驗證與防呆 (Validation & Exception Handling)
-- 位於 `utils/validator.py`，所有數值必須在進入模型前通過嚴密檢驗：
-  - **缺失值檢查**：明確指明缺漏欄位並阻止預測。
-  - **負數與格式檢查**：攔截負數、文字格式錯誤與 NaN/Inf。
-  - **生物/物理合理性檢查**：糖不可大於碳水化合物；單一營養素在 100g 食品中不得超過 100g；100g 食品熱量不得超過 1000 kcal（物理極限）。
-  - **標示基準確認**：非 100g/ml 基準時主動警示需換算。
-  - **全零食品確認機制**：六項數值皆為 0 時提示確認，防止 OCR 失誤被誤判為 A 級；若確認為純水或無糖茶，則進入專屬分析流程。
+### ✅ 輸入資料驗證與例外處理（`utils/validator.py`）
+每次送出分析前，系統會自動執行以下驗證，確保資料品質：
 
-### 3. 結果顯示順序整合與狀態防重複 (State Management)
-- **結果同步顯示**：AI 預測分級與營養觀察於背景完成後，在同一結果區塊一次性完整呈現，杜絕分級提前單獨曝光。
-- **防止重複呼叫**：API 請求僅於表單送出（`if submitted:`）時觸發一次並存入 `st.session_state`，頁面重新渲染（Rerun）不再重複發送請求，極大節省 API 配額。
-- **清除殘留結果**：表單重新提交或修改數值時，立即清除舊的預測與觀察結果。
+| 驗證規則 | 說明 |
+|---|---|
+| 全零值偵測 | 六項數值全為 0 時攔截，提示使用者 |
+| 負數檢查 | 拒絕任何負數營養成分輸入 |
+| 熱量上限 | 超過 1000 kcal/100g 視為不合理 |
+| 糖分合理性 | 糖分 > 碳水化合物時標記為異常 |
+| 宏量總和 | 蛋白質 + 脂肪 + 碳水 > 105g/100g 時提示 |
+| 鈉鹽換算 | 鹽分換算鈉含量過高時警告 |
 
-### 4. 高彈性重試與優雅降級 (Resilience & Retries)
-- 面對伺服器高負載（503 UNAVAILABLE）或連線逾時，自動執行最多 3 次之指數退避（Exponential Backoff）重試。
-- 精準區分 503 服務忙碌、429 配額超額與 401/403 設定權限問題，不向一般使用者暴露生硬的例外堆疊，遮蔽敏感金鑰。
-- 若 LLM 服務持續忙碌，隨機森林分級仍正常呈現，並提供「重新嘗試產生營養觀察」按鈕供單獨重試。
+### 🤖 AI Nutrition Grade 預測
+- 使用訓練完成的 Random Forest 分類模型（`random_forest_best.pkl`，Test Accuracy：76.12%）。
+- 輸入 6 項特徵：`energy_100g (kJ)`, `proteins_100g`, `fat_100g`, `carbohydrates_100g`, `sugars_100g`, `salt_100g`。
+- 預測結果為 A（最佳）～ E（最差）五個等級。
 
-### 5. 實用四段式 AI 營養觀察 (Actionable Nutrition Advice)
-改善舊版重複念數字的問題，改以四個明確段落呈現：
-- **🥗 營養特徵摘要**：客觀總結能量密度與主要營養成分。
-- **⚠️ 值得注意的營養項目**：針對最關鍵的 1～3 項重點深入解讀（如糖分過高、鈉含量顯著）。
-- **💡 飲食建議**：提供 1～3 項具體、可執行的飲食挑選、份量換算與食物搭配建議。
-- **📌 整體評估**：中立說明模型預測分級，強調綜合膳食考量，不將單一食品貼標籤，無醫療診斷宣稱。
+### 💬 結構化 AI 營養觀察報告（`utils/llm_vision.py`）
+AI 觀察報告採用固定 4 段結構輸出，避免單純重複數值，強調實用飲食建議：
+
+1. 🥗 **營養特徵摘要** — 整體特色，不重複原始數字
+2. ⚠️ **值得注意的營養項目** — 偏高/偏低的成分及其意義
+3. 💡 **飲食建議** — 具體、可操作的建議（如適量、搭配、替代品）
+4. 📌 **整體評估** — 以一句話總結這項食品的飲食定位
+
+### 🔁 API 錯誤重試與容錯
+- 自動對 503 Service Unavailable、429 Rate Limit 等暫時性錯誤執行指數退避重試（最多 3 次）。
+- 依錯誤類型分類顯示友善提示訊息，並避免在 log 中洩漏 API Key。
 
 ---
 
-## 3. 自動化測試集
+## 3. Demo 操作流程
 
-本專案在 `tests/` 資料夾內包含完善的單元測試與端對端測試：
-
-```bash
-# 執行全部 31 項測試
-python -m unittest discover tests -v
-
-# 單獨執行各測試模組
-python -m unittest tests/test_validation.py -v              # 資料驗證 9 項測試
-python -m unittest tests/test_advice_and_order.py -v        # 順序與 503 重試 8 項測試
-python -m unittest tests/test_nutrition_advice_quality.py -v # 觀察品質與情境 7 項測試
-python -m unittest tests/test_streamlit_app.py -v          # Streamlit UI 端對端 7 項測試
+```
+1. 上傳 / 拍攝食品營養標示圖片
+        ↓
+2. Gemini Vision API 自動辨識並填入數值（或手動輸入）
+        ↓
+3. 使用者確認 / 修改數值
+        ↓
+4. 資料驗證（全零、負數、合理性等）
+        ↓
+5. Random Forest 模型預測 Nutrition Grade（A～E）
+   + Gemini 生成 4 段結構化 AI 營養觀察
+        ↓
+6. 同步顯示分級結果與完整 AI 觀察報告
 ```
 
 ---
 
-## 4. Random Forest 模型規格
-- **模型路徑**：`04_Model/models/random_forest_best.pkl`
-- **特徵順序**：`energy_100g` (kJ), `proteins_100g`, `fat_100g`, `carbohydrates_100g`, `sugars_100g`, `salt_100g`
-- **獨立測試集 Accuracy**：**76.12%**
-- **標籤映射**：0=A, 1=B, 2=C, 3=D, 4=E
+## 4. 專案架構
+
+```
+06_Demo/
+├── app.py                  # Streamlit 主程式（UI 流程控制）
+├── requirements.txt        # Python 相依套件
+├── .env                    # API Key（請自行建立，勿提交）
+├── utils/
+│   ├── validator.py        # 輸入資料驗證與例外處理
+│   ├── model_runner.py     # Random Forest 模型載入與推論
+│   └── llm_vision.py       # Gemini OCR + 4段式 AI 觀察報告生成
+├── tests/
+│   ├── test_validation.py           # 資料驗證單元測試
+│   ├── test_streamlit_app.py        # Streamlit AppTest UI 測試
+│   ├── test_advice_and_order.py     # 顯示順序與觀察報告整合測試
+│   └── test_nutrition_advice_quality.py  # AI 觀察品質測試
+└── assets/                 # 靜態資源（示意圖等）
+```
 
 ---
-> ⚠️ **聲明**：本系統預測之營養分級與 AI 觀察報告僅供日常飲食參考，非個人健康診斷或醫療處方。食用選擇請依個人體質、活動量及專業醫師/營養師建議評估。
+
+## 5. Random Forest 模型說明
+
+| 項目 | 內容 |
+|---|---|
+| 模型路徑 | `04_Model/models/random_forest_best.pkl` |
+| 輸入特徵 | `energy_100g (kJ)`, `proteins_100g`, `fat_100g`, `carbohydrates_100g`, `sugars_100g`, `salt_100g` |
+| 輸出 | Nutrition Grade：A / B / C / D / E |
+| Test Accuracy | 76.12% |
+
+> **UI 單位解耦**：介面顯示大卡（kcal），送入模型前自動轉換為千焦耳（kJ，× 4.184）。
+
+---
+
+## 6. 執行自動化測試
+
+```bash
+cd 06_Demo
+pytest tests/ -v
+```
+
+目前共 31 項測試，涵蓋資料驗證、模型推論、顯示順序、API 錯誤處理與 AI 觀察品質。
+
+---
+
+> ⚠️ **聲明**：本模型預測與 AI 觀察結果不代表完整的健康評估。AI 模型僅根據統計資料學習到的相關性進行預測，不可作為醫療或健康診斷之依據。
